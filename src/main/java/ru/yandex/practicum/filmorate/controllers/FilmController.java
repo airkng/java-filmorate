@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -17,16 +16,8 @@ import java.util.List;
 @Slf4j
 public class FilmController {
     /**
-     * Для FilmController:
-     * добавление фильма;
-     * обновление фильма;
-     * получение всех фильмов.
-     * <p>
-     * Для Film:
-     * название не может быть пустым;
-     * максимальная длина описания — 200 символов;
-     * дата релиза — не раньше 28 декабря 1895 года;
-     * продолжительность фильма должна быть положительной.
+     * Я считаю, надо создать петицию, чтобы всех PM-ов уволили и вообще удалили такую профессию и оставить бэкендеров
+     * и девопсов. Ну ладно, может быть фронтендеров
      */
     private HashMap<Integer, Film> films = new HashMap<>();
     private static int countId = 1;

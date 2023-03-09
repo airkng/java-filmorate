@@ -1,14 +1,14 @@
 package ru.yandex.practicum.filmorate.controllers;
 
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exceptions.UniqueObjectException;
 import ru.yandex.practicum.filmorate.exceptions.ValidateException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -23,18 +23,14 @@ public class UserController {
     private static int countId = 1;
 
     @GetMapping
-    public List<User> getUsers() {
-        List<User> userList = new ArrayList<>();
-        for (User user : users.values()) {
-            userList.add(user);
-        }
-        return userList;
+    public Collection<User> getUsers() {
+       return users.values();
     }
 
     @PostMapping
     public User addUser(@Valid @RequestBody User user) {
         if (users.containsValue(user) || users.containsKey(user.getId())) {
-            throw new ValidateException("Объект " + user + " уже существует. Воспользуйтесь методом PUT");
+            throw new UniqueObjectException("Объект " + user + " уже существует. Воспользуйтесь методом PUT");
         }
         if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());
@@ -45,7 +41,8 @@ public class UserController {
         users.put(newUser.getId(), newUser);
         return newUser;
     }
-
+    //Метод PUT в данном случае похоже работает только на замену, так как просто при заносе
+    // в мапу, тесты выдают ошибку
     @PutMapping
     public User replaceUser(@Valid @RequestBody User user) {
         if (users.containsKey(user.getId())) {
@@ -57,15 +54,5 @@ public class UserController {
             throw new ValidateException("Объект " + user + " не найден");
         }
         return user;
-    }
-    @GetMapping("/sexman")
-    public User getAdminData() {
-        return User.builder()
-                .id(666)
-                .email("BillyHarrington@man.com")
-                .name("Billy Harrington")
-                .login("Admin")
-                .birthday(LocalDate.of(1969, 7, 4))
-                .build();
     }
 }

@@ -2,41 +2,34 @@ package ru.yandex.practicum.filmorate.controllers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exceptions.UniqueObjectException;
 import ru.yandex.practicum.filmorate.exceptions.ValidateException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 
 @RestController
 @RequestMapping("/films")
 @Slf4j
 public class FilmController {
-    /**
-     * Я считаю, надо создать петицию, чтобы всех PM-ов уволили и вообще удалили такую профессию и оставить бэкендеров
-     * и девопсов. Ну ладно, может быть фронтендеров
-     */
+
     private HashMap<Integer, Film> films = new HashMap<>();
     private static int countId = 1;
 
-    @GetMapping()
-    public List<Film> getFilms() {
-        List<Film> filmsList = new ArrayList<>();
-        for (Film film : films.values()) {
-            filmsList.add(film);
-        }
-        return filmsList;
+    @GetMapping
+    public Collection<Film> getFilms() {
+        return films.values();
     }
 
-    @PostMapping()
+    @PostMapping
     public Film addFilm(@Valid @RequestBody Film film) {
         checkFilmReleaseDate(film);
         if (films.containsKey(film.getId()) || films.containsValue(film)) {
             log.warn("Повторный запрос на добавление через метод POST {}", film);
-            throw new ValidateException("Объект " + film + " уже существует. Воспользуйтесь методом PUT");
+            throw new UniqueObjectException("Объект " + film + " уже существует. Воспользуйтесь методом PUT");
         }
         Film newFilm = film.toBuilder()
                 .id(countId++)
@@ -49,8 +42,9 @@ public class FilmController {
         // Это всегда так, если исключение обрабатываешь, то статус 200 приходит в ответ? Я потому что попытался исправить
         // это добавлением @ResponseStatus к исключению, но УВЫ
     }
-
-    @PutMapping()
+    //Метод PUT в данном случае похоже работает только на замену, так как просто при заносе
+    // в мапу, тесты выдают ошибку
+    @PutMapping
     public Film replaceFilm(@Valid @RequestBody Film film) {
         checkFilmReleaseDate(film);
         if (films.containsKey(film.getId())) {

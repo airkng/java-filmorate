@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
@@ -10,6 +11,7 @@ import java.time.LocalDate;
 import java.util.HashSet;
 
 @Data
+@AllArgsConstructor
 @Builder(toBuilder = true)
 public class Film {
     private static final int MAX_DESCRIPTION_LENGTH = 200;

@@ -105,14 +105,14 @@ public class UserController {
     return id;
     }
 
-    //TODO: переименовать метод
+
     @ExceptionHandler
-    public ResponseEntity<Map<String, String>> handle (final ObjectAlreadyExistException e) {
+    public ResponseEntity<Map<String, String>> handleAlreadyExistObject (final ObjectAlreadyExistException e) {
         return new ResponseEntity<>(Map.of("Error: ", e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler
-    public ResponseEntity<Map<String, String>> handleNotFound (final ObjectNotFoundException e) {
+    public ResponseEntity<Map<String, String>> handleNotFoundObject (final ObjectNotFoundException e) {
         return new ResponseEntity<>(Map.of("Exception: ", e.getMessage()), HttpStatus.NOT_FOUND);
     }
 }

@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 
 @Component
-public class InMemoryUserStorage implements IuserStorage {
+public class InMemoryUserStorage implements UserStorage {
     private HashMap<Integer, User> users = new HashMap<>();
 
     @Override
@@ -23,12 +23,8 @@ public class InMemoryUserStorage implements IuserStorage {
     }
 
     @Override
-    public boolean contains(User user) {
-        if (users.containsKey(user.getId()) || users.containsValue(user)) {
-            return true;
-        } else {
-            return false;
-        }
+    public boolean containsValue(User user) {
+        return users.containsValue(user);
     }
 
     @Override

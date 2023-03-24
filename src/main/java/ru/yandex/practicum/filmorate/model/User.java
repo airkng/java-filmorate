@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -13,6 +14,7 @@ import java.util.HashSet;
 @Data
 @AllArgsConstructor
 @Builder(toBuilder = true)
+@EqualsAndHashCode(exclude = {"id"})
 public class User {
     private final HashSet<Integer> friends = new HashSet<>();
 

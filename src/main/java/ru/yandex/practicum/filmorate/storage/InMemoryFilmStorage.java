@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 
 @Component
-public class InMemoryFilmStorage implements IfilmStorage {
+public class InMemoryFilmStorage implements FilmStorage {
     private HashMap<Integer, Film> films = new HashMap<>();
 
 
@@ -24,12 +24,8 @@ public class InMemoryFilmStorage implements IfilmStorage {
     }
 
     @Override
-    public boolean contains(Film film) {
-        if (films.containsKey(film.getId()) || films.containsValue(film)) {
-            return true;
-        } else {
-            return false;
-        }
+    public boolean containsValue(Film film) {
+        return films.containsValue(film);
     }
 
     @Override

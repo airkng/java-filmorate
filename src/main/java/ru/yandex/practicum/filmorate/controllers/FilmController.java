@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.unchecked.ObjectAlreadyExistException;
-import ru.yandex.practicum.filmorate.exceptions.unchecked.ObjectNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.ObjectAlreadyExistException;
+import ru.yandex.practicum.filmorate.exceptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
@@ -61,13 +61,5 @@ public class FilmController {
         return id;
     }
 
-    @ExceptionHandler
-    public ResponseEntity<Map<String, String>> handleNotFound(final ObjectNotFoundException e) {
-        return new ResponseEntity<>(Map.of("Exception: ", e.getMessage()), HttpStatus.NOT_FOUND);
-    }
 
-    @ExceptionHandler
-    public ResponseEntity<Map<String, String>> handleBadRequest(final ObjectAlreadyExistException e) {
-        return new ResponseEntity<>(Map.of("Exception: ", e.getMessage()), HttpStatus.BAD_REQUEST);
-    }
 }

@@ -2,9 +2,9 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.unchecked.ObjectAlreadyExistException;
-import ru.yandex.practicum.filmorate.exceptions.unchecked.ObjectNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.unchecked.ValidateException;
+import ru.yandex.practicum.filmorate.exceptions.ObjectAlreadyExistException;
+import ru.yandex.practicum.filmorate.exceptions.ObjectNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.ValidateException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -54,42 +54,45 @@ public class UserService {
         return user;
     }
 
-    public void addFriend(Integer id, Integer friendsId) throws ObjectNotFoundException, ObjectAlreadyExistException {
-        if (id == null || friendsId == null) {
-            throw new ValidateException("Отсутствует переменная пути id = " + id + "friendsId = " + friendsId);
-        }
+    public void addFriend(Integer id, Integer friendsId) {
+
         if (userStorage.containsKey(id) && userStorage.containsKey(friendsId)) {
             User user = userStorage.get(id);
             User friend = userStorage.get(friendsId);
 
-            if (user.containFriend(friendsId)) {
+            if (user.getFriends().contains(friendsId)) {
                 throw new ObjectAlreadyExistException("Object " + friend + " already add in friends");
             }
-            if (friend.containFriend(id)) {
+            if (friend.getFriends().contains(id)) {
                 throw new ObjectAlreadyExistException("Object " + user + " already add in friends");
             }
 
-            user.addFriend(friend.getId());
-            friend.addFriend(user.getId());
+            user.getFriends().add(friend.getId());
+            friend.getFriends().add(user.getId());
+            userStorage.put(user);
+            userStorage.put(friend);
         } else {
             throw new ObjectNotFoundException("Объект User с индексом " + id + " или " + friendsId + " не найден");
         }
     }
 
-    public void deleteFriend(Integer id, Integer friendId) throws ObjectNotFoundException {
+    public void deleteFriend(Integer id, Integer friendId) {
         if (userStorage.containsKey(id) && userStorage.containsKey(friendId)) {
             User user = userStorage.get(id);
             User friend = userStorage.get(friendId);
 
-            user.deleteFriend(friendId);
-            friend.deleteFriend(id);
+            user.getFriends().remove(friendId);
+            friend.getFriends().remove(id);
+
+            userStorage.put(user);
+            userStorage.put(friend);
         } else {
             throw new ObjectNotFoundException("Объект User с индексом " + id + " или " + friendId + " не найден");
         }
 
     }
 
-    public Collection<User> getFriends(Integer id) throws ObjectNotFoundException {
+    public Collection<User> getFriends(Integer id) {
         if (userStorage.containsKey(id)) {
             List<User> userList = new ArrayList<>();
             for (Integer userId : userStorage.get(id).getFriends()) {

@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.unchecked.ObjectAlreadyExistException;
-import ru.yandex.practicum.filmorate.exceptions.unchecked.ObjectNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.ObjectAlreadyExistException;
+import ru.yandex.practicum.filmorate.exceptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -72,14 +72,4 @@ public class UserController {
         return id;
     }
 
-
-    @ExceptionHandler
-    public ResponseEntity<Map<String, String>> handleAlreadyExistObject(final ObjectAlreadyExistException e) {
-        return new ResponseEntity<>(Map.of("Error: ", e.getMessage()), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<Map<String, String>> handleNotFoundObject(final ObjectNotFoundException e) {
-        return new ResponseEntity<>(Map.of("Exception: ", e.getMessage()), HttpStatus.NOT_FOUND);
-    }
 }

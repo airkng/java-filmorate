@@ -28,18 +28,6 @@ public class Film {
     @Positive
     private Integer duration;
 
-    public boolean deleteLike(Integer id) {
-        return likes.remove(id);
-    }
-
-    public boolean addLike(Integer id) {
-        return likes.add(id);
-    }
-
-    public boolean containLike(Integer id) {
-        return likes.contains(id);
-    }
-
     public HashSet<Integer> getLikes() {
         return likes;
     }

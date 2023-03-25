@@ -3,10 +3,10 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.unchecked.ObjectAlreadyExistException;
-import ru.yandex.practicum.filmorate.exceptions.unchecked.ObjectNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.unchecked.UniqueObjectException;
-import ru.yandex.practicum.filmorate.exceptions.unchecked.ValidateException;
+import ru.yandex.practicum.filmorate.exceptions.ObjectAlreadyExistException;
+import ru.yandex.practicum.filmorate.exceptions.ObjectNotFoundException;
+import ru.yandex.practicum.filmorate.exceptions.UniqueObjectException;
+import ru.yandex.practicum.filmorate.exceptions.ValidateException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -68,10 +68,9 @@ public class FilmService {
         return film;
     }
 
-    public void addLike(Integer filmId, Integer userId) throws ObjectNotFoundException, ObjectAlreadyExistException {
-        if (filmId == null || userId == null) {
-            throw new ValidateException("Отсутствует переменная пути id = " + filmId + "userId = " + userId);
-        }
+    public void addLike(Integer filmId, Integer userId) {
+        //Убрал ненужную проверку
+        // Как вариант добавить проверку чтобы не обращаться к бд по нескольку раз
         if (!filmStorage.containsKey(filmId)) {
             throw new ObjectNotFoundException("Film " + filmId + " not found");
         }
@@ -79,13 +78,14 @@ public class FilmService {
             throw new ObjectNotFoundException("User " + userId + " not found");
         }
         Film film = filmStorage.get(filmId);
-        if (film.containLike(userId)) {
+        if (film.getLikes().contains(userId)) {
             throw new ObjectAlreadyExistException("Like from " + userId + " already add");
         }
-        film.addLike(userId);
+        film.getLikes().add(userId);
+        filmStorage.put(film);
     }
 
-    public void deleteLike(Integer filmId, Integer userId) throws ObjectNotFoundException {
+    public void deleteLike(Integer filmId, Integer userId)  {
         if (!filmStorage.containsKey(filmId)) {
             throw new ObjectNotFoundException("Film " + filmId + " not found");
         }
@@ -93,10 +93,11 @@ public class FilmService {
             throw new ObjectNotFoundException("User " + userId + " not found");
         }
         Film film = filmStorage.get(filmId);
-        film.deleteLike(userId);
+        film.getLikes().remove(userId);
+        filmStorage.put(film);
     }
 
-    private static boolean checkFilmReleaseDate(Film film) throws ValidateException {
+    private static boolean checkFilmReleaseDate(Film film)  {
         final LocalDate borderDate = LocalDate.of(1895, 12, 28);
         if (film.getReleaseDate().isBefore(borderDate)) {
             throw new ValidateException("Дата релиза Film раньше " + borderDate);

@@ -28,18 +28,6 @@ public class User {
     @PastOrPresent(message = "Некорректная дата рождения")
     private LocalDate birthday;
 
-    public boolean deleteFriend(Integer id) {
-        return friends.remove(id);
-    }
-
-    public boolean addFriend(Integer id) {
-        return friends.add(id);
-    }
-
-    public boolean containFriend(Integer id) {
-        return friends.contains(id);
-    }
-
     public HashSet<Integer> getFriends() {
         return friends;
     }

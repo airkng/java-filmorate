@@ -12,4 +12,5 @@ Template repository for Filmorate project.
 *Как вариант это можно было бы реализовать через двойную связь в таблице User с полем user_id*
 
 [таблица](https://github.com/airkng/java-filmorate/blob/database-design/src/main/resources/database-design.png) <br>
-![f](https://dbdiagram.io/d/641f2fc15758ac5f17241887)
+
+![f](https://github.com/airkng/java-filmorate/blob/database-design/src/main/resources/database-design.png)

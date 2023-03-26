@@ -10,4 +10,5 @@ Template repository for Filmorate project.
 Стоит **обязательно упомянуть** таблицу friend_list. У него двойная связь с таблицей User. При создании пользователя User, помимо user_id ему присваивается идентификатор friend_id. На практике эти значения будут равны. friend_id нужен для того, чтобы в таблице friend_list мы понимали с кем дружит Пользователь с user_id.
 
 *Как вариант это можно было бы реализовать через двойную связь в таблице User с полем user_id*
-(https://github.com/airkng/java-filmorate/blob/database-design/src/main/resources/database-design.png)
+
+[таблица](https://github.com/airkng/java-filmorate/blob/database-design/src/main/resources/database-design.png)

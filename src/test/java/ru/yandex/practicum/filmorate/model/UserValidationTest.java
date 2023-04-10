@@ -21,7 +21,8 @@ public class UserValidationTest {
 
     @Test
     void shouldReturnZero_AllParamsIsGood() {
-        User user = new User(1, "example@email.com", "dev", "example", LocalDate.of(2000, 12, 1));
+        User user = new User(1, "example@email.com", "dev", "example", LocalDate.of(2000, 12, 1),
+                "test");
         user.setName(" ");
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
@@ -29,14 +30,16 @@ public class UserValidationTest {
     }
     @Test
     void shouldReturnOneException_EmailException() {
-        User user = new User(1, "incorrectEmail", "lol", " ", LocalDate.of(2000, 12, 1));
+        User user = new User(1, "incorrectEmail", "lol", " ", LocalDate.of(2000, 12, 1),
+                "test");
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertEquals(1, violations.size());
     }
     @Test
     void shouldReturnTwoExceptions_EmailAndLogin() {
-        User user = new User(1, "incorrectEmail", " ", " ", LocalDate.of(2000, 12, 1));
+        User user = new User(1, "incorrectEmail", " ", " ", LocalDate.of(2000, 12, 1),
+                "Неподтвержденная");
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertEquals(2, violations.size());
@@ -44,7 +47,8 @@ public class UserValidationTest {
 
     @Test
     void shouldReturnTwoExceptions_LoginAndDate() {
-        User user = new User(1, "correctEmail@email.com", " ", " ", LocalDate.of(2024, 12, 1));
+        User user = new User(1, "correctEmail@email.com", " ", " ", LocalDate.of(2024, 12, 1),
+                "Подтвержденная");
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertEquals(2, violations.size());

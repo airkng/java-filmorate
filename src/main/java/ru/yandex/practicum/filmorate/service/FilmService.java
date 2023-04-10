@@ -99,6 +99,7 @@ public class FilmService {
     }
 
     //MpaRating methods
+
     public MpaRating getMpaRating(Integer id) {
         Optional<MpaRating> mpa = mpaRatingDao.getMpaRating(id);
         if (mpa.isEmpty()) {

@@ -1,6 +1,9 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -25,7 +28,7 @@ public class User {
     private String name;
     @PastOrPresent(message = "Некорректная дата рождения")
     private LocalDate birthday;
-    private String friendship_status;
+
 
     public User(Integer id, String email, String login, String name, LocalDate birthday) {
         this.id = id;
@@ -33,14 +36,5 @@ public class User {
         this.login = login;
         this.name = name;
         this.birthday = birthday;
-    }
-
-    public User(Integer id, String email, String login, String name, LocalDate birthday, String friendship_status) {
-        this.id = id;
-        this.email = email;
-        this.login = login;
-        this.name = name;
-        this.birthday = birthday;
-        this.friendship_status = friendship_status;
     }
 }

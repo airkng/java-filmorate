@@ -32,7 +32,7 @@ public class GenreDaoImpl implements GenreDao {
     }
 
     @Override
-    public Genre[] addGenreToFilm(Genre[] genres, Integer film_id) {
+    public Genre[] addGenreToFilm(Genre[] genres, Integer filmId) {
         if (genres == null) {
             return new Genre[]{};
         }
@@ -42,7 +42,7 @@ public class GenreDaoImpl implements GenreDao {
                         "VALUES (?, ?) ";
         for (int i = 0; i < genres.length; i++) {
             Genre genre = genres[i];
-            jdbcTemplate.update(sqlQuery, genre.getId(), film_id);
+            jdbcTemplate.update(sqlQuery, genre.getId(), filmId);
             Optional<Genre> genreOptional = getGenre(genre.getId());
             genreOptional.ifPresent(fromDb::add);
         }

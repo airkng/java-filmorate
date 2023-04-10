@@ -10,7 +10,7 @@ public interface GenreDao {
 
     List<Genre> getAllGenres();
 
-    Genre[] addGenreToFilm(Genre[] genres, Integer film_id);
+    Genre[] addGenreToFilm(Genre[] genres, Integer filmId);
 
     boolean deleteGenresFromFilm(Integer id);
 }

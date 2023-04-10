@@ -23,12 +23,14 @@ public class ControllersExceptionHandler {
     public ResponseEntity<Map<String, String>> handleBadRequest(final ObjectAlreadyExistException e) {
         return new ResponseEntity<>(Map.of("Exception: ", e.getMessage()), HttpStatus.BAD_REQUEST);
     }
+
     @ExceptionHandler
-    public ResponseEntity<Map<String, String>> handleUniqueObjectException (final UniqueObjectException e) {
+    public ResponseEntity<Map<String, String>> handleUniqueObjectException(final UniqueObjectException e) {
         return new ResponseEntity<>(Map.of("Exception: ", e.getMessage()), HttpStatus.ALREADY_REPORTED);
     }
+
     @ExceptionHandler
-    public ResponseEntity<Map<String, String>> handleValidationException (final ValidateException e) {
+    public ResponseEntity<Map<String, String>> handleValidationException(final ValidateException e) {
         return new ResponseEntity<>(Map.of("Exception: ", e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 }

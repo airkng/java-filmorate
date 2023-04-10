@@ -8,10 +8,16 @@ import java.util.Optional;
 
 public interface UserStorage {
     User delete(User user);
+
     User put(User user);
+
     User replace(User user);
+
     boolean containsValue(User user);
+
     boolean containsKey(Integer id);
+
     Collection<User> getValues();
+
     Optional<User> get(Integer id);
 }

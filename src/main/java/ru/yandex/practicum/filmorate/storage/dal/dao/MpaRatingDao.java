@@ -7,5 +7,6 @@ import java.util.Optional;
 
 public interface MpaRatingDao {
     List<MpaRating> getAllMpaRatings();
+
     Optional<MpaRating> getMpaRating(Integer id);
 }

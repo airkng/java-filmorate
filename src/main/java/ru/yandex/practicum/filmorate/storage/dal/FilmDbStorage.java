@@ -62,7 +62,7 @@ public class FilmDbStorage implements FilmStorage {
         film.setId((Integer) kh.getKey());
         Optional<MpaRating> mpaRatingOptional = mpaRatingDao.getMpaRating(film.getMpa().getId());
 
-        if(mpaRatingOptional.isPresent()) {
+        if (mpaRatingOptional.isPresent()) {
             film.setMpa(mpaRatingOptional.get());
         }
 
@@ -90,8 +90,8 @@ public class FilmDbStorage implements FilmStorage {
     public boolean containsValue(Film film) {
         String sqlQuery =
                 "SELECT * " +
-                "FROM film as f " +
-                "WHERE name = ? AND description = ? AND release_date = ? AND duration= ?";
+                        "FROM film as f " +
+                        "WHERE name = ? AND description = ? AND release_date = ? AND duration= ?";
 
         Optional<Film> filmOptional = jdbcTemplate.query(sqlQuery, new FilmMapper(), film.getName(), film.getDescription(), film.getReleaseDate(),
                 film.getDuration()).stream().findAny();
@@ -108,10 +108,10 @@ public class FilmDbStorage implements FilmStorage {
     public boolean containsKey(Integer id) {
         String sqlQuery =
                 "SELECT * " +
-                "FROM film as f " +
-                "WHERE film_id = ?";
+                        "FROM film as f " +
+                        "WHERE film_id = ?";
         SqlRowSet srs = jdbcTemplate.queryForRowSet(sqlQuery, id);
-        if(srs.next()) {
+        if (srs.next()) {
             return true;
         } else {
             return false;
@@ -123,9 +123,9 @@ public class FilmDbStorage implements FilmStorage {
         List<Film> filmsList = new ArrayList<>();
         String sqlQueryFindFilm =
                 "SELECT film_id " +
-                "FROM film AS f";
+                        "FROM film AS f";
         SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet(sqlQueryFindFilm);
-        while(sqlRowSet.next()) {
+        while (sqlRowSet.next()) {
             Integer filmId = sqlRowSet.getInt("film_id");
             Optional<Film> film = get(filmId);
             if (film.isPresent()) {
@@ -140,15 +140,15 @@ public class FilmDbStorage implements FilmStorage {
         String sqlQuery = "" +
                 "SELECT * FROM film " +
                 "WHERE film_id=?";
-        Optional<Film> filmOptional = jdbcTemplate.query(sqlQuery, new FilmMapper(),id).stream().findAny();
+        Optional<Film> filmOptional = jdbcTemplate.query(sqlQuery, new FilmMapper(), id).stream().findAny();
         if (filmOptional.isPresent()) {
             Optional<MpaRating> mpaRatingOptional = mpaRatingDao.getMpaRating(filmOptional.get().getMpa().getId());
             mpaRatingOptional.ifPresent(mpaRating -> filmOptional.get().setMpa(mpaRating));
             String sqlQueryFindGenres =
                     "SELECT * " +
-                    "FROM film_genres AS fg " +
-                    "LEFT JOIN genre AS g ON fg.genre_id = g.genre_id " +
-                    "WHERE film_id = ?";
+                            "FROM film_genres AS fg " +
+                            "LEFT JOIN genre AS g ON fg.genre_id = g.genre_id " +
+                            "WHERE film_id = ?";
 
             Genre[] genres = jdbcTemplate.query(sqlQueryFindGenres, new GenreMapper(), id).toArray(new Genre[]{});
             filmOptional.get().setGenres(genres);

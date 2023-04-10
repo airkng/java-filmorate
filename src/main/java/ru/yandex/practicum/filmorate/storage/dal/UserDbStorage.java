@@ -88,7 +88,7 @@ public class UserDbStorage implements UserStorage {
                         "FROM users as u " +
                         "WHERE user_id = ?";
         SqlRowSet srs = jdbcTemplate.queryForRowSet(sqlQuery, id);
-        if(srs.next()) {
+        if (srs.next()) {
             return true;
         } else {
             return false;
@@ -102,7 +102,7 @@ public class UserDbStorage implements UserStorage {
                 "SELECT user_id " +
                         "FROM users AS u";
         SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet(sqlQueryFindFilm);
-        while(sqlRowSet.next()) {
+        while (sqlRowSet.next()) {
             Integer userId = sqlRowSet.getInt("user_id");
             Optional<User> user = get(userId);
             if (user.isPresent()) {

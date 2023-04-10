@@ -15,6 +15,7 @@ import java.util.List;
 public class LikeListDaoImpl implements LikeListDao {
     @Autowired
     private final JdbcTemplate jdbcTemplate;
+
     @Override
     public boolean deleteAllLikesFromFilm(Integer id) {
         String sqlForLikeList = "DELETE FROM like_list WHERE film_id = ?";
@@ -35,11 +36,11 @@ public class LikeListDaoImpl implements LikeListDao {
         String sqlQuery = "SELECT user_id " +
                 "FROM like_list " +
                 "WHERE film_id = ?";
-         SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id);
-         while(row.next()) {
-             likes.add(row.getInt("user_id"));
-         }
-         return likes;
+        SqlRowSet row = jdbcTemplate.queryForRowSet(sqlQuery, id);
+        while (row.next()) {
+            likes.add(row.getInt("user_id"));
+        }
+        return likes;
     }
 
     @Override

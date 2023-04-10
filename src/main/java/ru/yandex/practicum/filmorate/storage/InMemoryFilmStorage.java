@@ -5,6 +5,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Optional;
 
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
@@ -19,6 +20,12 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film put(Film film) {
+        films.put(film.getId(), film);
+        return film;
+    }
+
+    @Override
+    public Film replace(Film film) {
         films.put(film.getId(), film);
         return film;
     }
@@ -39,8 +46,8 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film get(Integer id) {
-        return films.get(id);
+    public Optional<Film> get(Integer id) {
+        return Optional.of(films.get(id));
     }
 
 

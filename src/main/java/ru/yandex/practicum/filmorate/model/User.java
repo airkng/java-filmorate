@@ -14,7 +14,7 @@ import java.util.HashSet;
 @EqualsAndHashCode(exclude = {"id"})
 
 public class User {
-    private final HashSet<Integer> friends = new HashSet<>();
+    private HashSet<Integer> friends = new HashSet<>();
 
     private Integer id;
     @Email(message = "Некорректный email")
@@ -33,5 +33,14 @@ public class User {
         this.login = login;
         this.name = name;
         this.birthday = birthday;
+    }
+
+    public User(Integer id, String email, String login, String name, LocalDate birthday, String friendship_status) {
+        this.id = id;
+        this.email = email;
+        this.login = login;
+        this.name = name;
+        this.birthday = birthday;
+        this.friendship_status = friendship_status;
     }
 }

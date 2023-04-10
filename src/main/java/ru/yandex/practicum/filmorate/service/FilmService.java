@@ -8,12 +8,16 @@ import ru.yandex.practicum.filmorate.exceptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.UniqueObjectException;
 import ru.yandex.practicum.filmorate.exceptions.ValidateException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.MpaRating;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.dal.dao.GenreDao;
+import ru.yandex.practicum.filmorate.storage.dal.dao.LikeListDao;
+import ru.yandex.practicum.filmorate.storage.dal.dao.MpaRatingDao;
 
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -21,9 +25,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 
 public class FilmService {
-    private static int countId = 1;
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
+    private final MpaRatingDao mpaRatingDao;
+    private final GenreDao genreDao;
+    private final LikeListDao likeListDao;
 
     public List<Film> getCountPopularFilms(Integer count) {
         if (count < 0) {
@@ -37,52 +43,49 @@ public class FilmService {
     }
 
     public Collection<Film> getFilmList() {
-        return filmStorage.getValues();
+        return filmStorage.getValues().stream().sorted(Comparator.comparingInt(Film::getId)).collect(Collectors.toList());
     }
 
-    public Film getFilmById(Integer id) {
-        if (!filmStorage.containsKey(id)) {
+    public Optional<Film> getFilmById(Integer id) {
+        Optional<Film> film = filmStorage.get(id);
+        if (film.isEmpty()) {
             throw new ObjectNotFoundException("Object Film id = " + id + " not found");
         }
-        return filmStorage.get(id);
+        return film;
     }
 
     public Film addFilm(Film film) {
         checkFilmReleaseDate(film);
+        film.setGenres(checkForGenresDuplicates(film.getGenres()));
         if (filmStorage.containsValue(film)) {
             log.warn("Повторный запрос на добавление через метод POST {}", film);
             throw new UniqueObjectException("Объект " + film + " уже существует. Воспользуйтесь методом PUT");
         }
-        film.setId(countId++);
-        filmStorage.put(film);
-        return film;
+        return filmStorage.put(film);
     }
 
     public Film replaceFilm(Film film) {
         checkFilmReleaseDate(film);
+        film.setGenres(checkForGenresDuplicates(film.getGenres()));
         if (!filmStorage.containsKey(film.getId())) {
             log.warn("Не существующий объект {} метод PUT", film);
-            throw new ValidateException(film + "не существует. Воспользуйтесь методом Post");
+            throw new ObjectNotFoundException(film + "не существует. Воспользуйтесь методом Post");
         }
-        filmStorage.put(film);
-        return film;
+        return filmStorage.replace(film);
     }
 
     public void addLike(Integer filmId, Integer userId) {
-        //Убрал ненужную проверку
-        // Как вариант добавить проверку чтобы не обращаться к бд по нескольку раз
         if (!filmStorage.containsKey(filmId)) {
             throw new ObjectNotFoundException("Film " + filmId + " not found");
         }
         if (!userStorage.containsKey(userId)) {
             throw new ObjectNotFoundException("User " + userId + " not found");
         }
-        Film film = filmStorage.get(filmId);
-        if (film.getLikes().contains(userId)) {
+        HashSet<Integer> likes = new HashSet<>(likeListDao.getLikesFromFilm(filmId));
+        if (likes.contains(userId)) {
             throw new ObjectAlreadyExistException("Like from " + userId + " already add");
         }
-        film.getLikes().add(userId);
-        filmStorage.put(film);
+        likeListDao.addLike(filmId, userId);
     }
 
     public void deleteLike(Integer filmId, Integer userId)  {
@@ -92,9 +95,39 @@ public class FilmService {
         if (!userStorage.containsKey(userId)) {
             throw new ObjectNotFoundException("User " + userId + " not found");
         }
-        Film film = filmStorage.get(filmId);
-        film.getLikes().remove(userId);
-        filmStorage.put(film);
+        likeListDao.removeLike(filmId, userId);
+    }
+    //MpaRating methods
+    public MpaRating getMpaRating(Integer id) {
+        Optional<MpaRating> mpa = mpaRatingDao.getMpaRating(id);
+        if(mpa.isEmpty()) {
+            throw new ObjectNotFoundException(String.format("Рейтинг с id = %d не найден", id));
+        }
+        return mpa.get();
+    }
+
+    public Collection<MpaRating> getAllMpaRatings() {
+        List<MpaRating> mpaList = mpaRatingDao.getAllMpaRatings();
+        if(mpaList.isEmpty()) {
+            throw new ObjectNotFoundException("Рейтинги не были найдены");
+        }
+        return mpaList;
+    }
+    //Genres methods
+    public Genre getGenre(Integer id) {
+        Optional<Genre> genre = genreDao.getGenre(id);
+        if(genre.isEmpty()) {
+            throw new ObjectNotFoundException(String.format("Жанр с id=%d не найден", id));
+        }
+        return genre.get();
+    }
+
+    public Collection<Genre> getAllGenres() {
+        List<Genre> genreList = genreDao.getAllGenres();
+        if(genreList.isEmpty()) {
+            throw new ObjectNotFoundException("Жанры не были найдены");
+        }
+        return genreList;
     }
 
     private static boolean checkFilmReleaseDate(Film film)  {
@@ -105,4 +138,12 @@ public class FilmService {
         return true;
     }
 
+    private static Genre[] checkForGenresDuplicates(Genre[] genres) {
+        if (genres == null) {
+            return null;
+        }
+        TreeSet<Genre> set = new TreeSet<>(Arrays.asList(genres));
+
+        return set.toArray(new Genre[]{});
+    }
 }

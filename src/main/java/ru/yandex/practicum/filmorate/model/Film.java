@@ -9,9 +9,9 @@ import java.time.LocalDate;
 import java.util.HashSet;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @EqualsAndHashCode(exclude = {"id"})
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder(toBuilder = true)
 
 public class Film {

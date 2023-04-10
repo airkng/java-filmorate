@@ -17,7 +17,7 @@ public class FriendshipDaoImpl implements FriendshipDao {
     public boolean deleteAllFriendsFromUser(Integer id) {
         String sqlQuery =
                 "DELETE FROM friends_list " +
-                "WHERE user_id = ?";
+                        "WHERE user_id = ?";
         jdbcTemplate.update(sqlQuery, id);
         return true;
     }
@@ -35,7 +35,7 @@ public class FriendshipDaoImpl implements FriendshipDao {
     public boolean addFriend(Integer userId, Integer friendId) {
         String sqlQuery =
                 "INSERT INTO friends_list(user_id, friend_id, status_id) " +
-                "VALUES (?, ?, ?)";
+                        "VALUES (?, ?, ?)";
         jdbcTemplate.update(sqlQuery, userId, friendId, ACCEPTED_FRIEND_STATUS);
 
         String sqlQueryForFriend = "INSERT INTO friends_list(user_id, friend_id, status_id) " +

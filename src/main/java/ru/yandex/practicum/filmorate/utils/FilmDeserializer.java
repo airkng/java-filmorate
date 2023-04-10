@@ -28,13 +28,13 @@ public class FilmDeserializer extends StdDeserializer<Film> {
     @Override
     public Film deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JacksonException {
         JsonNode node = jsonParser.getCodec().readTree(jsonParser);
-        Integer id = (Integer)((IntNode) node.get("id")).numberValue();
+        Integer id = (Integer) ((IntNode) node.get("id")).numberValue();
         String name = node.get("name").asText();
         String description = node.get("description").asText();
         Integer duration = (Integer) ((IntNode) node.get("duration")).numberValue();
         //LocalDate releaseDate = LocalDate.of(((Date) node.get("releaseDate").as)
 
-    return null;
+        return null;
 
     }
 }

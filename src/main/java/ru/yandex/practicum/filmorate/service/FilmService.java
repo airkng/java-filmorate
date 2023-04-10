@@ -88,7 +88,7 @@ public class FilmService {
         likeListDao.addLike(filmId, userId);
     }
 
-    public void deleteLike(Integer filmId, Integer userId)  {
+    public void deleteLike(Integer filmId, Integer userId) {
         if (!filmStorage.containsKey(filmId)) {
             throw new ObjectNotFoundException("Film " + filmId + " not found");
         }
@@ -97,10 +97,11 @@ public class FilmService {
         }
         likeListDao.removeLike(filmId, userId);
     }
+
     //MpaRating methods
     public MpaRating getMpaRating(Integer id) {
         Optional<MpaRating> mpa = mpaRatingDao.getMpaRating(id);
-        if(mpa.isEmpty()) {
+        if (mpa.isEmpty()) {
             throw new ObjectNotFoundException(String.format("Рейтинг с id = %d не найден", id));
         }
         return mpa.get();
@@ -108,15 +109,16 @@ public class FilmService {
 
     public Collection<MpaRating> getAllMpaRatings() {
         List<MpaRating> mpaList = mpaRatingDao.getAllMpaRatings();
-        if(mpaList.isEmpty()) {
+        if (mpaList.isEmpty()) {
             throw new ObjectNotFoundException("Рейтинги не были найдены");
         }
         return mpaList;
     }
+
     //Genres methods
     public Genre getGenre(Integer id) {
         Optional<Genre> genre = genreDao.getGenre(id);
-        if(genre.isEmpty()) {
+        if (genre.isEmpty()) {
             throw new ObjectNotFoundException(String.format("Жанр с id=%d не найден", id));
         }
         return genre.get();
@@ -124,13 +126,13 @@ public class FilmService {
 
     public Collection<Genre> getAllGenres() {
         List<Genre> genreList = genreDao.getAllGenres();
-        if(genreList.isEmpty()) {
+        if (genreList.isEmpty()) {
             throw new ObjectNotFoundException("Жанры не были найдены");
         }
         return genreList;
     }
 
-    private static boolean checkFilmReleaseDate(Film film)  {
+    private static boolean checkFilmReleaseDate(Film film) {
         final LocalDate borderDate = LocalDate.of(1895, 12, 28);
         if (film.getReleaseDate().isBefore(borderDate)) {
             throw new ValidateException("Дата релиза Film раньше " + borderDate);

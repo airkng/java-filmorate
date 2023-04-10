@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.node.IntNode;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.io.IOException;
-import java.time.LocalDate;
 
 public class FilmDeserializer extends StdDeserializer<Film> {
     //Неудачная попытка создать десериализатор

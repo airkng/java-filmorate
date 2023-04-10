@@ -12,6 +12,7 @@ import ru.yandex.practicum.filmorate.service.UserService;
 import javax.validation.Valid;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
@@ -25,7 +26,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable(value = "id") Integer id) {
+    public Optional<User> getUserById(@PathVariable(value = "id") Integer id) {
         return userService.getUserById(id);
     }
 
@@ -47,8 +48,6 @@ public class UserController {
         return userService.addUser(user);
     }
 
-    //Метод PUT в данном случае похоже работает только на замену, так как просто при заносе
-    // в мапу, тесты выдают ошибку
     @PutMapping
     public User replaceUser(@Valid @RequestBody User user) {
         return userService.replaceUser(user);

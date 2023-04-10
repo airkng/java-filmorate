@@ -1,24 +1,19 @@
 package ru.yandex.practicum.filmorate.controllers;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.ObjectAlreadyExistException;
-import ru.yandex.practicum.filmorate.exceptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/films")
-@Slf4j
 @RequiredArgsConstructor
+
 public class FilmController {
     private final FilmService filmService;
 
@@ -28,7 +23,7 @@ public class FilmController {
     }
 
     @GetMapping("/{id}")
-    public Film getFilmById(@PathVariable(value = "id") Integer id) {
+    public Optional<Film> getFilmById(@PathVariable(value = "id") Integer id) {
         return filmService.getFilmById(id);
     }
 
@@ -42,8 +37,6 @@ public class FilmController {
         return filmService.addFilm(film);
     }
 
-    //Метод PUT в данном случае похоже работает только на замену, так как просто при заносе
-    // в мапу, тесты выдают ошибку
     @PutMapping
     public Film replaceFilm(@Valid @RequestBody Film film) {
         return filmService.replaceFilm(film);

@@ -1,12 +1,11 @@
-package ru.yandex.practicum.filmorate.storage.dal.daoImpl;
+package ru.yandex.practicum.filmorate.dal.dao.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.dal.dao.GenreDao;
+import ru.yandex.practicum.filmorate.dal.mappers.GenreMapper;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.storage.dal.dao.GenreDao;
-import ru.yandex.practicum.filmorate.storage.dal.mappers.GenreMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +15,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 
 public class GenreDaoImpl implements GenreDao {
-    @Autowired
+
     private final JdbcTemplate jdbcTemplate;
 
     @Override

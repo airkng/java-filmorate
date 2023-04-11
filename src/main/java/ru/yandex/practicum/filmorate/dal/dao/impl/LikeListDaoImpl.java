@@ -1,11 +1,10 @@
-package ru.yandex.practicum.filmorate.storage.dal.daoImpl;
+package ru.yandex.practicum.filmorate.dal.dao.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.storage.dal.dao.LikeListDao;
+import ru.yandex.practicum.filmorate.dal.dao.LikeListDao;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +12,7 @@ import java.util.List;
 @Repository
 @RequiredArgsConstructor
 public class LikeListDaoImpl implements LikeListDao {
-    @Autowired
+
     private final JdbcTemplate jdbcTemplate;
 
     @Override

@@ -5,8 +5,8 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.ObjectAlreadyExistException;
 import ru.yandex.practicum.filmorate.exceptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
-import ru.yandex.practicum.filmorate.storage.dal.dao.FriendshipDao;
+import ru.yandex.practicum.filmorate.dal.dao.UserDao;
+import ru.yandex.practicum.filmorate.dal.dao.FriendshipDao;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -15,67 +15,60 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
 
-    private final UserStorage userStorage;
+    private final UserDao userDao;
     private final FriendshipDao friendshipDao;
 
     public Collection<User> getUserList() {
-        return userStorage.getValues().stream().sorted(Comparator.comparingInt(User::getId)).collect(Collectors.toList());
+        return userDao.getValues().stream().sorted(Comparator.comparingInt(User::getId)).collect(Collectors.toList());
     }
 
-    public Optional<User> getUserById(Integer id) {
-        Optional<User> user = userStorage.get(id);
-        if (user.isEmpty()) {
+    public User getUserById(Integer id) {
+        return userDao.get(id).orElseThrow(() -> {
             throw new ObjectNotFoundException("Объект User c " + id + " not found");
-        }
-        return user;
+        });
     }
 
     public User addUser(User user) {
-        if (userStorage.containsValue(user)) {
+        if (userDao.containsValue(user)) {
             throw new ObjectAlreadyExistException("Объект " + user + " уже существует. Воспользуйтесь методом PUT");
         }
         if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
-        userStorage.put(user);
-        return user;
+        return userDao.put(user);
     }
 
     public User replaceUser(User user) {
-        if (userStorage.containsKey(user.getId())) {
+        if (userDao.containsKey(user.getId())) {
             if (user.getName() == null || user.getName().isEmpty()) {
                 user.setName(user.getLogin());
             }
-            userStorage.replace(user);
+            return userDao.replace(user);
         } else {
             throw new ObjectNotFoundException("Объект " + user + " не найден");
         }
-        return user;
     }
 
     public void addFriend(Integer userId, Integer friendsId) {
-
-        if (userStorage.containsKey(userId) && userStorage.containsKey(friendsId)) {
-            Optional<User> userOptional = userStorage.get(userId);
-            Optional<User> friendOptional = userStorage.get(friendsId);
-            User user = userOptional.get();
-            User friend = friendOptional.get();
-
-            if (user.getFriends() != null && user.getFriends().contains(friendsId)) {
-                throw new ObjectAlreadyExistException("Object " + friend + " already add in friends");
+            Optional<User> userOptional = userDao.get(userId);
+            Optional<User> friendOptional = userDao.get(friendsId);
+            if (userOptional.isPresent() && friendOptional.isPresent()) {
+                if (userOptional.get().getFriends() != null && userOptional.get().getFriends().contains(friendsId)) {
+                    throw new ObjectAlreadyExistException("Object " + friendOptional + " already add in friends");
+                }
+                if (friendOptional.get().getFriends() != null && friendOptional.get().getFriends().contains(userId)) {
+                    throw new ObjectAlreadyExistException("Object " + userOptional + " already add in friends");
+                }
+                friendshipDao.addFriend(userId, friendsId);
+            } else {
+                throw new ObjectNotFoundException("Объект User с индексом " + userId + " или " + friendsId + " не найден");
             }
-            if (friend.getFriends() != null && friend.getFriends().contains(userId)) {
-                throw new ObjectAlreadyExistException("Object " + user + " already add in friends");
-            }
-            friendshipDao.addFriend(userId, friendsId);
-        } else {
-            throw new ObjectNotFoundException("Объект User с индексом " + userId + " или " + friendsId + " не найден");
-        }
+
     }
 
     public void deleteFriend(Integer id, Integer friendId) {
-        Optional<User> userOptional = userStorage.get(id);
-        Optional<User> friendOptional = userStorage.get(friendId);
+        Optional<User> userOptional = userDao.get(id);
+        Optional<User> friendOptional = userDao.get(friendId);
         if (userOptional.isPresent() && friendOptional.isPresent()) {
             friendshipDao.deleteFriendFromUser(id, friendId);
         } else {
@@ -85,14 +78,14 @@ public class UserService {
     }
 
     public Collection<User> getFriends(Integer id) {
-        if (userStorage.containsKey(id)) {
+        if (userDao.containsKey(id)) {
             List<User> userList = new ArrayList<>();
-            HashSet<Integer> friendIdList = userStorage.get(id).get().getFriends();
+            HashSet<Integer> friendIdList = userDao.get(id).get().getFriends();
             if (friendIdList.isEmpty()) {
                 return List.of();
             }
             for (Integer userId : friendIdList) {
-                userList.add(userStorage.get(userId).get());
+                userList.add(userDao.get(userId).get());
             }
             return userList;
         } else {
@@ -101,21 +94,25 @@ public class UserService {
     }
 
     public Collection<User> getCommonFriends(Integer id, Integer otherId) {
-        if (userStorage.containsKey(id) && userStorage.containsKey(otherId)) {
-            if (userStorage.get(id).get().getFriends().isEmpty() || userStorage.get(otherId).get().getFriends().isEmpty()) {
-                return List.of();
-            }
-            List<User> commonFriends = new ArrayList<>();
-            HashSet<Integer> otherUserFriendsSet = userStorage.get(otherId).get().getFriends();
+        Optional<User> userOptional = userDao.get(id);
+        Optional<User> friendOptional = userDao.get(otherId);
 
-            for (Integer userId : userStorage.get(id).get().getFriends()) {
+        if (userOptional.isEmpty() && friendOptional.isEmpty()
+                || (userOptional.get().getFriends().isEmpty() || friendOptional.get().getFriends().isEmpty())
+        ) {
+            return List.of();
+        } else {
+            List<User> commonFriends = new ArrayList<>();
+            HashSet<Integer> otherUserFriendsSet = friendOptional.get().getFriends();
+
+            for (Integer userId : userOptional.get().getFriends()) {
                 if (otherUserFriendsSet.contains(userId)) {
-                    commonFriends.add(userStorage.get(userId).get());
+                    commonFriends.add(userDao.get(userId).get());
                 }
             }
             return commonFriends;
-        } else {
-            return List.of();
         }
+
+
     }
 }

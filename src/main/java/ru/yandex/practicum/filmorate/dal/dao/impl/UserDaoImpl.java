@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.dal;
+package ru.yandex.practicum.filmorate.dal.dao.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
@@ -7,12 +7,12 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.dal.dao.FriendshipDao;
+import ru.yandex.practicum.filmorate.dal.dao.LikeListDao;
+import ru.yandex.practicum.filmorate.dal.dao.UserDao;
+import ru.yandex.practicum.filmorate.dal.mappers.FriendMapper;
+import ru.yandex.practicum.filmorate.dal.mappers.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
-import ru.yandex.practicum.filmorate.storage.dal.dao.FriendshipDao;
-import ru.yandex.practicum.filmorate.storage.dal.dao.LikeListDao;
-import ru.yandex.practicum.filmorate.storage.dal.mappers.FriendMapper;
-import ru.yandex.practicum.filmorate.storage.dal.mappers.UserMapper;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -22,7 +22,7 @@ import java.util.*;
 @Component
 @Primary
 @RequiredArgsConstructor
-public class UserDbStorage implements UserStorage {
+public class UserDaoImpl implements UserDao {
     private final JdbcTemplate jdbcTemplate;
     private final LikeListDao likeListDao;
     private final FriendshipDao friendshipDao;

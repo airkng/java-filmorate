@@ -1,14 +1,15 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.dal.storage;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.dal.dao.FilmDao;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Optional;
 
 @Component
-public class InMemoryFilmStorage implements FilmStorage {
+public class InMemoryFilmStorage implements FilmDao {
     private HashMap<Integer, Film> films = new HashMap<>();
 
 

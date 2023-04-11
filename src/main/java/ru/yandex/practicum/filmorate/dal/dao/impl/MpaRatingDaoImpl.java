@@ -1,12 +1,12 @@
-package ru.yandex.practicum.filmorate.storage.dal.daoImpl;
+package ru.yandex.practicum.filmorate.dal.dao.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.dal.dao.MpaRatingDao;
+import ru.yandex.practicum.filmorate.dal.mappers.MpaRatingMapper;
 import ru.yandex.practicum.filmorate.model.MpaRating;
-import ru.yandex.practicum.filmorate.storage.dal.dao.MpaRatingDao;
-import ru.yandex.practicum.filmorate.storage.dal.mappers.MpaRatingMapper;
 
 import java.util.List;
 import java.util.Optional;

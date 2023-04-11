@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.dal.mappers;
+package ru.yandex.practicum.filmorate.dal.mappers;
 
 import org.springframework.jdbc.core.RowMapper;
 

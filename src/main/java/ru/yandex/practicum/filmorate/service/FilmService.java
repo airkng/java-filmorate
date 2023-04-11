@@ -3,18 +3,13 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.ObjectAlreadyExistException;
+import ru.yandex.practicum.filmorate.dal.dao.*;
 import ru.yandex.practicum.filmorate.exceptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.UniqueObjectException;
 import ru.yandex.practicum.filmorate.exceptions.ValidateException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MpaRating;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
-import ru.yandex.practicum.filmorate.storage.dal.dao.GenreDao;
-import ru.yandex.practicum.filmorate.storage.dal.dao.LikeListDao;
-import ru.yandex.practicum.filmorate.storage.dal.dao.MpaRatingDao;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -25,8 +20,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 
 public class FilmService {
-    private final FilmStorage filmStorage;
-    private final UserStorage userStorage;
+    private final FilmDao filmDao;
+    private final UserDao userDao;
     private final MpaRatingDao mpaRatingDao;
     private final GenreDao genreDao;
     private final LikeListDao likeListDao;
@@ -35,7 +30,7 @@ public class FilmService {
         if (count < 0) {
             throw new ValidateException("Variable count is negative or null: " + count);
         }
-        Collection<Film> filmSet = filmStorage.getValues();
+        Collection<Film> filmSet = filmDao.getValues();
         return filmSet.stream()
                 .sorted((f1, f2) -> -1 * (f1.getLikes().size() - f2.getLikes().size()))
                 .limit(count)
@@ -43,56 +38,50 @@ public class FilmService {
     }
 
     public Collection<Film> getFilmList() {
-        return filmStorage.getValues().stream().sorted(Comparator.comparingInt(Film::getId)).collect(Collectors.toList());
+        return filmDao.getValues().stream().sorted(Comparator.comparingInt(Film::getId)).collect(Collectors.toList());
     }
 
-    public Optional<Film> getFilmById(Integer id) {
-        Optional<Film> film = filmStorage.get(id);
-        if (film.isEmpty()) {
+    public Film getFilmById(Integer id) {
+        return filmDao.get(id).orElseThrow(() -> {
             throw new ObjectNotFoundException("Object Film id = " + id + " not found");
-        }
-        return film;
+        });
     }
 
     public Film addFilm(Film film) {
         checkFilmReleaseDate(film);
         film.setGenres(checkForGenresDuplicates(film.getGenres()));
-        if (filmStorage.containsValue(film)) {
+        if (filmDao.containsValue(film)) {
             log.warn("Повторный запрос на добавление через метод POST {}", film);
             throw new UniqueObjectException("Объект " + film + " уже существует. Воспользуйтесь методом PUT");
         }
-        return filmStorage.put(film);
+        return filmDao.put(film);
     }
 
     public Film replaceFilm(Film film) {
         checkFilmReleaseDate(film);
         film.setGenres(checkForGenresDuplicates(film.getGenres()));
-        if (!filmStorage.containsKey(film.getId())) {
+        if (!filmDao.containsKey(film.getId())) {
             log.warn("Не существующий объект {} метод PUT", film);
             throw new ObjectNotFoundException(film + "не существует. Воспользуйтесь методом Post");
         }
-        return filmStorage.replace(film);
+        return filmDao.replace(film);
     }
 
     public void addLike(Integer filmId, Integer userId) {
-        if (!filmStorage.containsKey(filmId)) {
+        if (!filmDao.containsKey(filmId)) {
             throw new ObjectNotFoundException("Film " + filmId + " not found");
         }
-        if (!userStorage.containsKey(userId)) {
+        if (!userDao.containsKey(userId)) {
             throw new ObjectNotFoundException("User " + userId + " not found");
         }
-        HashSet<Integer> likes = new HashSet<>(likeListDao.getLikesFromFilm(filmId));
-        if (likes.contains(userId)) {
-            throw new ObjectAlreadyExistException("Like from " + userId + " already add");
-        }
+        likeListDao.removeLike(filmId, userId);
         likeListDao.addLike(filmId, userId);
     }
 
     public void deleteLike(Integer filmId, Integer userId) {
-        if (!filmStorage.containsKey(filmId)) {
-            throw new ObjectNotFoundException("Film " + filmId + " not found");
-        }
-        if (!userStorage.containsKey(userId)) {
+        //TODO: попробовал удалить 2 условия ниже. Тесты из требуют, чтобы при удалении
+        // лайка от несушествующего пользователя он выводил 404 Not found -_-
+        if (!userDao.containsKey(userId)) {
             throw new ObjectNotFoundException("User " + userId + " not found");
         }
         likeListDao.removeLike(filmId, userId);

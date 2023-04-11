@@ -1,14 +1,15 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.dal.storage;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.dal.dao.UserDao;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Optional;
 
 @Component
-public class InMemoryUserStorage implements UserStorage {
+public class InMemoryUserDao implements UserDao {
     private HashMap<Integer, User> users = new HashMap<>();
 
     @Override

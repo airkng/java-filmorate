@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.dal.dao;
+package ru.yandex.practicum.filmorate.dal.dao;
 
 public interface FriendshipDao {
     public static final Integer ACCEPTED_FRIEND_STATUS = 1;

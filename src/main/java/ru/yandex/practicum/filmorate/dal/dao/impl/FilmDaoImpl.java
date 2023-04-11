@@ -1,22 +1,21 @@
-package ru.yandex.practicum.filmorate.storage.dal;
+package ru.yandex.practicum.filmorate.dal.dao.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.dal.dao.FilmDao;
+import ru.yandex.practicum.filmorate.dal.dao.GenreDao;
+import ru.yandex.practicum.filmorate.dal.dao.LikeListDao;
+import ru.yandex.practicum.filmorate.dal.dao.MpaRatingDao;
+import ru.yandex.practicum.filmorate.dal.mappers.FilmMapper;
+import ru.yandex.practicum.filmorate.dal.mappers.GenreMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MpaRating;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.dal.dao.GenreDao;
-import ru.yandex.practicum.filmorate.storage.dal.dao.LikeListDao;
-import ru.yandex.practicum.filmorate.storage.dal.dao.MpaRatingDao;
-import ru.yandex.practicum.filmorate.storage.dal.mappers.FilmMapper;
-import ru.yandex.practicum.filmorate.storage.dal.mappers.GenreMapper;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -26,8 +25,8 @@ import java.util.*;
 @Repository
 @Primary
 @RequiredArgsConstructor
-public class FilmDbStorage implements FilmStorage {
-    @Autowired
+public class FilmDaoImpl implements FilmDao {
+
     private final JdbcTemplate jdbcTemplate;
     private final GenreDao genreDao;
     private final MpaRatingDao mpaRatingDao;
@@ -75,7 +74,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film replace(Film film) {
         genreDao.deleteGenresFromFilm(film.getId());
-
+        //Меняется, почему нет? у меня в запросе меняется rating_id, который устанавливает новый mpa-rating фильму
         String sqlQuery = "UPDATE film " +
                 "SET name = ?, release_date = ?, description = ?, duration = ?, rating_id = ? " +
                 "WHERE film_id = ?";
@@ -143,6 +142,7 @@ public class FilmDbStorage implements FilmStorage {
         Optional<Film> filmOptional = jdbcTemplate.query(sqlQuery, new FilmMapper(), id).stream().findAny();
         if (filmOptional.isPresent()) {
             Optional<MpaRating> mpaRatingOptional = mpaRatingDao.getMpaRating(filmOptional.get().getMpa().getId());
+            //Вот тут не понял, что ты имеешь ввиду под join'ом. Что значит добавлять через джоин
             mpaRatingOptional.ifPresent(mpaRating -> filmOptional.get().setMpa(mpaRating));
             String sqlQueryFindGenres =
                     "SELECT * " +

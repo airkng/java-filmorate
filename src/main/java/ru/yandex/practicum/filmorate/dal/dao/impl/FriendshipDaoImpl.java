@@ -1,16 +1,15 @@
-package ru.yandex.practicum.filmorate.storage.dal.daoImpl;
+package ru.yandex.practicum.filmorate.dal.dao.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.storage.dal.dao.FriendshipDao;
+import ru.yandex.practicum.filmorate.dal.dao.FriendshipDao;
 
 @Repository
 @RequiredArgsConstructor
 
 public class FriendshipDaoImpl implements FriendshipDao {
-    @Autowired
+
     private final JdbcTemplate jdbcTemplate;
 
     @Override

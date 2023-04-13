@@ -122,6 +122,20 @@ public class FilmDaoTest {
         assertEquals(film, correctFilm);
     }
 
+    @Order(4)
+    @Test
+    public void removeFilm_shouldReturnTrue() {
+        filmStorage.delete(Film.builder().id(1).build());
+        filmStorage.delete(Film.builder().id(2).build());
+        filmStorage.delete(Film.builder().id(3).build());
+        filmStorage.delete(Film.builder().id(4).build());
+
+        assertEquals(filmStorage.get(1), Optional.empty());
+        assertEquals(filmStorage.get(2), Optional.empty());
+        assertEquals(filmStorage.get(3), Optional.empty());
+        assertEquals(filmStorage.get(4), Optional.empty());
+    }
+
     @Test
     void getAllMpa_shouldReturnCorrectListSize() {
         List<MpaRating> mpaRatingList = mpaRatingDao.getAllMpaRatings();

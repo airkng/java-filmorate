@@ -8,6 +8,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.dal.dao.FilmDao;
 import ru.yandex.practicum.filmorate.dal.dao.LikeListDao;
 import ru.yandex.practicum.filmorate.dal.dao.UserDao;
@@ -29,6 +30,7 @@ public class LikeListDaoTest {
     private final LikeListDao likeListDao;
     private final FilmDao filmDao;
     private final UserDao userDao;
+    private final JdbcTemplate jdbcTemplate;
 
     @Order(1)
     @Test
@@ -41,7 +43,11 @@ public class LikeListDaoTest {
         likeListDao.removeLike(film.getId(), user.getId());
 
         assertEquals(likeListDao.getLikesFromFilm(film.getId()), List.of());
+
+        userDao.delete(user);
+        filmDao.delete(film);
+
+        jdbcTemplate.update("ALTER TABLE users ALTER COLUMN user_id RESTART WITH 1");
+        jdbcTemplate.update("ALTER TABLE film ALTER COLUMN film_id RESTART WITH 1");
     }
-
-
 }

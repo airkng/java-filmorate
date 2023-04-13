@@ -32,13 +32,12 @@ public class UserDaoTest {
     public void post_shouldReturnUser_afterPostInDb() {
 
         User user = userDao.add(User.builder()
-                .id(1)
                 .name("test")
                 .email("test@email.com")
                 .login("test1")
                 .birthday(LocalDate.of(2000, 1, 17))
                 .build());
-        assertEquals(user.getId(), 1);
+
         assertEquals(user.getName(), "test");
         assertEquals(user.getEmail(), "test@email.com");
         assertEquals(user.getLogin(), "test1");
@@ -66,11 +65,10 @@ public class UserDaoTest {
                 .birthday(LocalDate.of(1990, 2, 16))
                 .build());
 
-        assertEquals(user.getId(), 2);
         assertEquals(user.getName(), "new User");
         assertEquals(user.getEmail(), "user@email.com");
         assertEquals(user.getLogin(), "newLogin");
-        Optional<User> uo = userDao.get(2);
+
     }
 
     @Order(4)

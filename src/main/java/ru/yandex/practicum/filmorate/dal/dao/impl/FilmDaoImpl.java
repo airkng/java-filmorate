@@ -140,8 +140,8 @@ public class FilmDaoImpl implements FilmDao {
             Integer ratingId = sqlRowSet.getInt("rating_id");
             String ratingName = sqlRowSet.getString("rating_name");
 
-            Optional<Film> filmOptional = Optional.of(Film.builder().
-                    id(filmId)
+            Optional<Film> filmOptional = Optional.of(Film.builder()
+                    .id(filmId)
                     .description(description)
                     .name(name)
                     .releaseDate(releaseDate)
@@ -161,7 +161,6 @@ public class FilmDaoImpl implements FilmDao {
             filmsList.add(filmOptional.get());
         }
         return filmsList;
-
     }
 
     @Override
@@ -184,8 +183,8 @@ public class FilmDaoImpl implements FilmDao {
             Integer ratingId = sqlRowSet.getInt("rating_id");
             String ratingName = sqlRowSet.getString("rating_name");
 
-            Optional<Film> filmOptional = Optional.of(Film.builder().
-                    id(filmId)
+            Optional<Film> filmOptional = Optional.of(Film.builder()
+                    .id(filmId)
                     .description(description)
                     .name(name)
                     .releaseDate(releaseDate)

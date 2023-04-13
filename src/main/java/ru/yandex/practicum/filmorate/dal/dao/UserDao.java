@@ -6,11 +6,12 @@ import java.util.Collection;
 import java.util.Optional;
 
 public interface UserDao {
+
     User delete(User user);
 
-    User put(User user);
+    User add(User user);
 
-    User replace(User user);
+    User update(User user);
 
     boolean containsValue(User user);
 

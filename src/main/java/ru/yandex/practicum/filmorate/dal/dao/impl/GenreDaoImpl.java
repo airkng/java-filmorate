@@ -31,21 +31,21 @@ public class GenreDaoImpl implements GenreDao {
     }
 
     @Override
-    public Genre[] addGenreToFilm(Genre[] genres, Integer filmId) {
-        if (genres == null) {
-            return new Genre[]{};
+    public List<Genre> addGenreToFilm(List<Genre> genres, Integer filmId) {
+        if (genres == null || genres.isEmpty()) {
+            return List.of();
         }
         List<Genre> fromDb = new ArrayList<>();
         String sqlQuery =
                 "INSERT INTO film_genres(genre_id, film_id) " +
                         "VALUES (?, ?) ";
-        for (int i = 0; i < genres.length; i++) {
-            Genre genre = genres[i];
+        for (int i = 0; i < genres.size(); i++) {
+            Genre genre = genres.get(i);
             jdbcTemplate.update(sqlQuery, genre.getId(), filmId);
             Optional<Genre> genreOptional = getGenre(genre.getId());
             genreOptional.ifPresent(fromDb::add);
         }
-        return fromDb.toArray(genres);
+        return fromDb;
     }
 
     @Override

@@ -38,7 +38,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public User put(User user) {
+    public User add(User user) {
         String sqlQuery = "INSERT INTO users(email, login, nickname, birthday)" +
                 "VALUES(?, ?, ?, ?) ";
         KeyHolder kh = new GeneratedKeyHolder();
@@ -57,7 +57,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public User replace(User user) {
+    public User update(User user) {
         String sqlQuery = "UPDATE users " +
                 "SET email = ?, login = ?, nickname = ?, birthday = ? " +
                 "WHERE user_id = ?";

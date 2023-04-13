@@ -1,8 +1,8 @@
 package ru.yandex.practicum.filmorate.dal.storage;
 
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.dal.dao.UserDao;
+import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -19,13 +19,13 @@ public class InMemoryUserDao implements UserDao {
     }
 
     @Override
-    public User put(User user) {
+    public User add(User user) {
         users.put(user.getId(), user);
         return user;
     }
 
     @Override
-    public User replace(User user) {
+    public User update(User user) {
         users.put(user.getId(), user);
         return user;
     }

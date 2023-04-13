@@ -8,9 +8,9 @@ import java.util.Optional;
 public interface FilmDao {
     Film delete(Film film);
 
-    Film put(Film film);
+    Film add(Film film);
 
-    Film replace(Film film);
+    Film update(Film film);
 
     boolean containsValue(Film film);
 

@@ -7,6 +7,7 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 
 @Data
 @EqualsAndHashCode(exclude = {"id"})
@@ -26,7 +27,7 @@ public class Film {
     private LocalDate releaseDate;
     @Positive
     private Integer duration;
-    private Genre[] genres;
+    private List<Genre> genres;
     private MpaRating mpa;
 
     public Film(Integer id, String name, String description, LocalDate releaseDate, Integer duration) {

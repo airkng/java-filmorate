@@ -20,6 +20,8 @@ import ru.yandex.practicum.filmorate.model.MpaRating;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Repository
@@ -43,7 +45,7 @@ public class FilmDaoImpl implements FilmDao {
     }
 
     @Override
-    public Film put(Film film) {
+    public Film add(Film film) {
         String sqlQuery = "INSERT INTO film(name, description, release_date, duration, rating_id)" +
                 "VALUES(?, ?, ?, ?, ?) ";
         KeyHolder kh = new GeneratedKeyHolder();
@@ -72,9 +74,8 @@ public class FilmDaoImpl implements FilmDao {
     }
 
     @Override
-    public Film replace(Film film) {
+    public Film update(Film film) {
         genreDao.deleteGenresFromFilm(film.getId());
-        //Меняется, почему нет? у меня в запросе меняется rating_id, который устанавливает новый mpa-rating фильму
         String sqlQuery = "UPDATE film " +
                 "SET name = ?, release_date = ?, description = ?, duration = ?, rating_id = ? " +
                 "WHERE film_id = ?";
@@ -120,42 +121,91 @@ public class FilmDaoImpl implements FilmDao {
     @Override
     public Collection<Film> getValues() {
         List<Film> filmsList = new ArrayList<>();
-        String sqlQueryFindFilm =
-                "SELECT film_id " +
-                        "FROM film AS f";
-        SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet(sqlQueryFindFilm);
-        while (sqlRowSet.next()) {
-            Integer filmId = sqlRowSet.getInt("film_id");
-            Optional<Film> film = get(filmId);
-            if (film.isPresent()) {
-                filmsList.add(film.get());
-            }
-        }
-        return filmsList;
-    }
-
-    @Override
-    public Optional<Film> get(Integer id) {
         String sqlQuery = "" +
-                "SELECT * FROM film " +
-                "WHERE film_id=?";
-        Optional<Film> filmOptional = jdbcTemplate.query(sqlQuery, new FilmMapper(), id).stream().findAny();
-        if (filmOptional.isPresent()) {
-            Optional<MpaRating> mpaRatingOptional = mpaRatingDao.getMpaRating(filmOptional.get().getMpa().getId());
-            //Вот тут не понял, что ты имеешь ввиду под join'ом. Что значит добавлять через джоин
-            mpaRatingOptional.ifPresent(mpaRating -> filmOptional.get().setMpa(mpaRating));
+                "SELECT * " +
+                "FROM film AS f " +
+                "JOIN mpa_rating AS mr ON mr.rating_id = f.rating_id ";
+
+        SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet(sqlQuery);
+
+        while (sqlRowSet.next()) {
+            String date = sqlRowSet.getString("release_date");
+            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate releaseDate = LocalDate.parse(date, timeFormatter);
+            String name = sqlRowSet.getString("name");
+            String description = sqlRowSet.getString("description");
+
+            Integer duration = sqlRowSet.getInt("duration");
+            Integer filmId = sqlRowSet.getInt("film_id");
+            Integer ratingId = sqlRowSet.getInt("rating_id");
+            String ratingName = sqlRowSet.getString("rating_name");
+
+            Optional<Film> filmOptional = Optional.of(Film.builder().
+                    id(filmId)
+                    .description(description)
+                    .name(name)
+                    .releaseDate(releaseDate)
+                    .duration(duration)
+                    .mpa(new MpaRating(ratingId, ratingName))
+                    .build());
+
             String sqlQueryFindGenres =
                     "SELECT * " +
                             "FROM film_genres AS fg " +
                             "LEFT JOIN genre AS g ON fg.genre_id = g.genre_id " +
                             "WHERE film_id = ?";
 
-            Genre[] genres = jdbcTemplate.query(sqlQueryFindGenres, new GenreMapper(), id).toArray(new Genre[]{});
+            List<Genre> genres = jdbcTemplate.query(sqlQueryFindGenres, new GenreMapper(), filmId);
+            filmOptional.get().setGenres(genres);
+            filmOptional.get().setLikes(new HashSet<>(likeListDao.getLikesFromFilm(filmId)));
+            filmsList.add(filmOptional.get());
+        }
+        return filmsList;
+
+    }
+
+    @Override
+    public Optional<Film> get(Integer id) {
+        String sqlQuery = "" +
+                "SELECT * " +
+                "FROM film AS f " +
+                "JOIN mpa_rating AS mr ON mr.rating_id = f.rating_id " +
+                "WHERE film_id=? ";
+        SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet(sqlQuery, id);
+        if (sqlRowSet.next()) {
+            String date = sqlRowSet.getString("release_date");
+            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate releaseDate = LocalDate.parse(date, timeFormatter);
+            String name = sqlRowSet.getString("name");
+            String description = sqlRowSet.getString("description");
+
+            Integer duration = sqlRowSet.getInt("duration");
+            Integer filmId = sqlRowSet.getInt("film_id");
+            Integer ratingId = sqlRowSet.getInt("rating_id");
+            String ratingName = sqlRowSet.getString("rating_name");
+
+            Optional<Film> filmOptional = Optional.of(Film.builder().
+                    id(filmId)
+                    .description(description)
+                    .name(name)
+                    .releaseDate(releaseDate)
+                    .duration(duration)
+                    .mpa(new MpaRating(ratingId, ratingName))
+                    .build());
+
+            String sqlQueryFindGenres =
+                    "SELECT * " +
+                            "FROM film_genres AS fg " +
+                            "LEFT JOIN genre AS g ON fg.genre_id = g.genre_id " +
+                            "WHERE film_id = ?";
+
+            List<Genre> genres = jdbcTemplate.query(sqlQueryFindGenres, new GenreMapper(), id);
             filmOptional.get().setGenres(genres);
 
             filmOptional.get().setLikes(new HashSet<>(likeListDao.getLikesFromFilm(id)));
             return filmOptional;
         }
+
         return Optional.empty();
     }
 

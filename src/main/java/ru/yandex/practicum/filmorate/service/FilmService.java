@@ -54,7 +54,7 @@ public class FilmService {
             log.warn("Повторный запрос на добавление через метод POST {}", film);
             throw new UniqueObjectException("Объект " + film + " уже существует. Воспользуйтесь методом PUT");
         }
-        return filmDao.put(film);
+        return filmDao.add(film);
     }
 
     public Film replaceFilm(Film film) {
@@ -64,7 +64,7 @@ public class FilmService {
             log.warn("Не существующий объект {} метод PUT", film);
             throw new ObjectNotFoundException(film + "не существует. Воспользуйтесь методом Post");
         }
-        return filmDao.replace(film);
+        return filmDao.update(film);
     }
 
     public void addLike(Integer filmId, Integer userId) {
@@ -130,12 +130,12 @@ public class FilmService {
         return true;
     }
 
-    private static Genre[] checkForGenresDuplicates(Genre[] genres) {
-        if (genres == null) {
-            return null;
+    private static List<Genre> checkForGenresDuplicates(List<Genre> genres) {
+        if (genres == null || genres.isEmpty()) {
+            return List.of();
         }
-        TreeSet<Genre> set = new TreeSet<>(Arrays.asList(genres));
+        TreeSet<Genre> set = new TreeSet<>(genres);
 
-        return set.toArray(new Genre[]{});
+        return new ArrayList<>(set);
     }
 }

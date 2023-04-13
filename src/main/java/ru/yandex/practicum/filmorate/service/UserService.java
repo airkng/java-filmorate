@@ -2,11 +2,11 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dal.dao.FriendshipDao;
+import ru.yandex.practicum.filmorate.dal.dao.UserDao;
 import ru.yandex.practicum.filmorate.exceptions.ObjectAlreadyExistException;
 import ru.yandex.practicum.filmorate.exceptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.dal.dao.UserDao;
-import ru.yandex.practicum.filmorate.dal.dao.FriendshipDao;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,7 +35,7 @@ public class UserService {
         if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
-        return userDao.put(user);
+        return userDao.add(user);
     }
 
     public User replaceUser(User user) {
@@ -43,26 +43,26 @@ public class UserService {
             if (user.getName() == null || user.getName().isEmpty()) {
                 user.setName(user.getLogin());
             }
-            return userDao.replace(user);
+            return userDao.update(user);
         } else {
             throw new ObjectNotFoundException("Объект " + user + " не найден");
         }
     }
 
     public void addFriend(Integer userId, Integer friendsId) {
-            Optional<User> userOptional = userDao.get(userId);
-            Optional<User> friendOptional = userDao.get(friendsId);
-            if (userOptional.isPresent() && friendOptional.isPresent()) {
-                if (userOptional.get().getFriends() != null && userOptional.get().getFriends().contains(friendsId)) {
-                    throw new ObjectAlreadyExistException("Object " + friendOptional + " already add in friends");
-                }
-                if (friendOptional.get().getFriends() != null && friendOptional.get().getFriends().contains(userId)) {
-                    throw new ObjectAlreadyExistException("Object " + userOptional + " already add in friends");
-                }
-                friendshipDao.addFriend(userId, friendsId);
-            } else {
-                throw new ObjectNotFoundException("Объект User с индексом " + userId + " или " + friendsId + " не найден");
+        Optional<User> userOptional = userDao.get(userId);
+        Optional<User> friendOptional = userDao.get(friendsId);
+        if (userOptional.isPresent() && friendOptional.isPresent()) {
+            if (userOptional.get().getFriends() != null && userOptional.get().getFriends().contains(friendsId)) {
+                throw new ObjectAlreadyExistException("Object " + friendOptional + " already add in friends");
             }
+            if (friendOptional.get().getFriends() != null && friendOptional.get().getFriends().contains(userId)) {
+                throw new ObjectAlreadyExistException("Object " + userOptional + " already add in friends");
+            }
+            friendshipDao.addFriend(userId, friendsId);
+        } else {
+            throw new ObjectNotFoundException("Объект User с индексом " + userId + " или " + friendsId + " не найден");
+        }
 
     }
 

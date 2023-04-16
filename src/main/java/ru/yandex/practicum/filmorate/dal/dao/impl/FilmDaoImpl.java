@@ -232,13 +232,13 @@ public class FilmDaoImpl implements FilmDao {
         HashMap<Integer, HashSet<Integer>> allLikes = new HashMap<>();
         while (likesFromDb.next()) {
             Integer filmId = likesFromDb.getInt("film_id");
-            Integer user_id = likesFromDb.getInt("user_id");
+            Integer userId = likesFromDb.getInt("user_id");
             if (allLikes.containsKey(filmId)) {
                 HashSet<Integer> filmLikesSet = allLikes.get(filmId);
-                filmLikesSet.add(user_id);
+                filmLikesSet.add(userId);
                 allLikes.put(filmId, filmLikesSet);
             } else {
-                allLikes.put(filmId, new HashSet<>(Set.of(user_id)));
+                allLikes.put(filmId, new HashSet<>(Set.of(userId)));
             }
         }
         return allLikes;

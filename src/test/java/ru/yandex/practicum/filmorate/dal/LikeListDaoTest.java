@@ -45,8 +45,8 @@ public class LikeListDaoTest {
             .description("desc")
             .duration(123)
             .mpa(new MpaRating(1, null))
-            .releaseDate(LocalDate.now()).
-            build();
+            .releaseDate(LocalDate.now())
+            .build();
 
     @BeforeEach
     public void addDataToDb() {
@@ -86,8 +86,8 @@ public class LikeListDaoTest {
                 .description("test2")
                 .duration(100)
                 .mpa(new MpaRating(2, null))
-                .releaseDate(LocalDate.now()).
-                build();
+                .releaseDate(LocalDate.now())
+                .build();
 
         User user2 = User.builder()
                 .id(2)

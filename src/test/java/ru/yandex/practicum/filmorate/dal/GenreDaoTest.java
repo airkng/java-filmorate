@@ -44,4 +44,9 @@ public class GenreDaoTest {
         assertEquals(action.get(), new Genre(6, "Боевик"));
         assertEquals(empty, Optional.empty());
     }
+
+    @Test
+    public void get_shouldReturnEmptyOptional_NonExistGenre() {
+        assertEquals(genreDao.getGenre(999), Optional.empty());
+    }
 }

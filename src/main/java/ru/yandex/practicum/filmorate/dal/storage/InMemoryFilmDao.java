@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Optional;
 
 @Component
-public class InMemoryFilmStorage implements FilmDao {
+public class InMemoryFilmDao implements FilmDao {
     private HashMap<Integer, Film> films = new HashMap<>();
 
 

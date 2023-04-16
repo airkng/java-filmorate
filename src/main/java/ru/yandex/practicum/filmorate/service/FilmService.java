@@ -79,8 +79,6 @@ public class FilmService {
     }
 
     public void deleteLike(Integer filmId, Integer userId) {
-        //TODO: попробовал удалить 2 условия ниже. Тесты из требуют, чтобы при удалении
-        // лайка от несушествующего пользователя он выводил 404 Not found -_-
         if (!userDao.containsKey(userId)) {
             throw new ObjectNotFoundException("User " + userId + " not found");
         }

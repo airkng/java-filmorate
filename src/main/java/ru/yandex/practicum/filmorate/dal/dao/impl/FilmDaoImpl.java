@@ -120,44 +120,39 @@ public class FilmDaoImpl implements FilmDao {
 
     @Override
     public Collection<Film> getValues() {
-        List<Film> filmsList = new ArrayList<>();
+        String sqlQueryFindGenres =
+                "SELECT * " +
+                        "FROM film_genres AS fg " +
+                        "LEFT JOIN genre AS g ON fg.genre_id = g.genre_id ";
+
+        SqlRowSet genresFromDb = jdbcTemplate.queryForRowSet(sqlQueryFindGenres);
+        HashMap<Integer, List<Genre>> allGenres = convertSqlRowSetToGenres(genresFromDb);
+
+        String sqlQueryFindAllLikes = "SELECT * FROM like_list ";
+        SqlRowSet likesFromDb = jdbcTemplate.queryForRowSet(sqlQueryFindAllLikes);
+        HashMap<Integer, HashSet<Integer>> allLikes = convertSqlRowSetToLikeList(likesFromDb);
+
         String sqlQuery = "" +
                 "SELECT * " +
                 "FROM film AS f " +
                 "JOIN mpa_rating AS mr ON mr.rating_id = f.rating_id ";
-
         SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet(sqlQuery);
+        List<Film> filmsList = new ArrayList<>();
+
 
         while (sqlRowSet.next()) {
-            String date = sqlRowSet.getString("release_date");
-            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            LocalDate releaseDate = LocalDate.parse(date, timeFormatter);
-            String name = sqlRowSet.getString("name");
-            String description = sqlRowSet.getString("description");
+            Optional<Film> filmOptional = convertSqlRowSetToFilm(sqlRowSet);
 
-            Integer duration = sqlRowSet.getInt("duration");
-            Integer filmId = sqlRowSet.getInt("film_id");
-            Integer ratingId = sqlRowSet.getInt("rating_id");
-            String ratingName = sqlRowSet.getString("rating_name");
-
-            Optional<Film> filmOptional = Optional.of(Film.builder()
-                    .id(filmId)
-                    .description(description)
-                    .name(name)
-                    .releaseDate(releaseDate)
-                    .duration(duration)
-                    .mpa(new MpaRating(ratingId, ratingName))
-                    .build());
-
-            String sqlQueryFindGenres =
-                    "SELECT * " +
-                            "FROM film_genres AS fg " +
-                            "LEFT JOIN genre AS g ON fg.genre_id = g.genre_id " +
-                            "WHERE film_id = ?";
-
-            List<Genre> genres = jdbcTemplate.query(sqlQueryFindGenres, new GenreMapper(), filmId);
-            filmOptional.get().setGenres(genres);
-            filmOptional.get().setLikes(new HashSet<>(likeListDao.getLikesFromFilm(filmId)));
+            if (allGenres.get(filmOptional.get().getId()) == null) {
+                filmOptional.get().setGenres(List.of());
+            } else {
+                filmOptional.get().setGenres(allGenres.get(filmOptional.get().getId()));
+            }
+            if (allLikes.get(filmOptional.get().getId()) == null) {
+                filmOptional.get().setLikes(new HashSet<>());
+            } else {
+                filmOptional.get().setLikes(allLikes.get(filmOptional.get().getId()));
+            }
             filmsList.add(filmOptional.get());
         }
         return filmsList;
@@ -172,25 +167,7 @@ public class FilmDaoImpl implements FilmDao {
                 "WHERE film_id=? ";
         SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet(sqlQuery, id);
         if (sqlRowSet.next()) {
-            String date = sqlRowSet.getString("release_date");
-            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            LocalDate releaseDate = LocalDate.parse(date, timeFormatter);
-            String name = sqlRowSet.getString("name");
-            String description = sqlRowSet.getString("description");
-
-            Integer duration = sqlRowSet.getInt("duration");
-            Integer filmId = sqlRowSet.getInt("film_id");
-            Integer ratingId = sqlRowSet.getInt("rating_id");
-            String ratingName = sqlRowSet.getString("rating_name");
-
-            Optional<Film> filmOptional = Optional.of(Film.builder()
-                    .id(filmId)
-                    .description(description)
-                    .name(name)
-                    .releaseDate(releaseDate)
-                    .duration(duration)
-                    .mpa(new MpaRating(ratingId, ratingName))
-                    .build());
+            Optional<Film> filmOptional = convertSqlRowSetToFilm(sqlRowSet);
 
             String sqlQueryFindGenres =
                     "SELECT * " +
@@ -208,4 +185,62 @@ public class FilmDaoImpl implements FilmDao {
         return Optional.empty();
     }
 
+    private Optional<Film> convertSqlRowSetToFilm(SqlRowSet sqlRowSet) {
+
+        String date = sqlRowSet.getString("release_date");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate releaseDate = LocalDate.parse(date, timeFormatter);
+        String name = sqlRowSet.getString("name");
+        String description = sqlRowSet.getString("description");
+
+        Integer duration = sqlRowSet.getInt("duration");
+        Integer filmId = sqlRowSet.getInt("film_id");
+        Integer ratingId = sqlRowSet.getInt("rating_id");
+        String ratingName = sqlRowSet.getString("rating_name");
+
+        Optional<Film> filmOptional = Optional.of(Film.builder()
+                .id(filmId)
+                .description(description)
+                .name(name)
+                .releaseDate(releaseDate)
+                .duration(duration)
+                .mpa(new MpaRating(ratingId, ratingName))
+                .build());
+        return filmOptional;
+
+    }
+
+    private HashMap<Integer, List<Genre>> convertSqlRowSetToGenres(SqlRowSet genresFromDb) {
+        HashMap<Integer, List<Genre>> allGenres = new HashMap<>();
+        while (genresFromDb.next()) {
+            Integer filmId = genresFromDb.getInt("film_id");
+            Integer genreId = genresFromDb.getInt("genre_id");
+            String genreName = genresFromDb.getString("genre_name");
+            Genre genre = new Genre(genreId, genreName);
+            if (allGenres.containsKey(filmId)) {
+                List<Genre> genreList = allGenres.get(genreId);
+                genreList.add(genre);
+                allGenres.put(filmId, genreList);
+            } else {
+                allGenres.put(filmId, List.of(genre));
+            }
+        }
+        return allGenres;
+    }
+
+    private HashMap<Integer, HashSet<Integer>> convertSqlRowSetToLikeList(SqlRowSet likesFromDb) {
+        HashMap<Integer, HashSet<Integer>> allLikes = new HashMap<>();
+        while (likesFromDb.next()) {
+            Integer filmId = likesFromDb.getInt("film_id");
+            Integer user_id = likesFromDb.getInt("user_id");
+            if (allLikes.containsKey(filmId)) {
+                HashSet<Integer> filmLikesSet = allLikes.get(filmId);
+                filmLikesSet.add(user_id);
+                allLikes.put(filmId, filmLikesSet);
+            } else {
+                allLikes.put(filmId, new HashSet<>(Set.of(user_id)));
+            }
+        }
+        return allLikes;
+    }
 }

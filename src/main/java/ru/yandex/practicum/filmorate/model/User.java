@@ -1,9 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -13,10 +10,12 @@ import java.util.HashSet;
 
 @Data
 @AllArgsConstructor
-@Builder(toBuilder = true)
+@NoArgsConstructor
 @EqualsAndHashCode(exclude = {"id"})
+@Builder(toBuilder = true)
+
 public class User {
-    private final HashSet<Integer> friends = new HashSet<>();
+    private HashSet<Integer> friends = new HashSet<>();
 
     private Integer id;
     @Email(message = "Некорректный email")
@@ -28,7 +27,12 @@ public class User {
     @PastOrPresent(message = "Некорректная дата рождения")
     private LocalDate birthday;
 
-    public HashSet<Integer> getFriends() {
-        return friends;
+
+    public User(Integer id, String email, String login, String name, LocalDate birthday) {
+        this.id = id;
+        this.email = email;
+        this.login = login;
+        this.name = name;
+        this.birthday = birthday;
     }
 }

@@ -1,13 +1,15 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.dal.storage;
 
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.dal.dao.FilmDao;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Optional;
 
 @Component
-public class InMemoryFilmStorage implements FilmStorage {
+public class InMemoryFilmDao implements FilmDao {
     private HashMap<Integer, Film> films = new HashMap<>();
 
 
@@ -18,7 +20,13 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film put(Film film) {
+    public Film add(Film film) {
+        films.put(film.getId(), film);
+        return film;
+    }
+
+    @Override
+    public Film update(Film film) {
         films.put(film.getId(), film);
         return film;
     }
@@ -39,8 +47,8 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film get(Integer id) {
-        return films.get(id);
+    public Optional<Film> get(Integer id) {
+        return Optional.of(films.get(id));
     }
 
 

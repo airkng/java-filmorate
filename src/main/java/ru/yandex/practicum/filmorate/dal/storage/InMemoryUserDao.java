@@ -1,23 +1,31 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.dal.storage;
 
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.dal.dao.UserDao;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Optional;
 
 @Component
-public class InMemoryUserStorage implements UserStorage {
+public class InMemoryUserDao implements UserDao {
     private HashMap<Integer, User> users = new HashMap<>();
 
     @Override
     public User delete(User user) {
-       users.remove(user.getId());
-       return user;
+        users.remove(user.getId());
+        return user;
     }
 
     @Override
-    public User put(User user) {
+    public User add(User user) {
+        users.put(user.getId(), user);
+        return user;
+    }
+
+    @Override
+    public User update(User user) {
         users.put(user.getId(), user);
         return user;
     }
@@ -38,8 +46,8 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User get(Integer id) {
-        return users.get(id);
+    public Optional<User> get(Integer id) {
+        return Optional.of(users.get(id));
     }
 
 
